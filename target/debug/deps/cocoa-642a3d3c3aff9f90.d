@@ -1,0 +1,12 @@
+/Users/junjieding/dingjunjie_dev/2024_10/halashao/target/debug/deps/libcocoa-642a3d3c3aff9f90.rmeta: /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/lib.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/appkit.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/base.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/foundation.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/quartzcore.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/macros.rs
+
+/Users/junjieding/dingjunjie_dev/2024_10/halashao/target/debug/deps/libcocoa-642a3d3c3aff9f90.rlib: /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/lib.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/appkit.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/base.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/foundation.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/quartzcore.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/macros.rs
+
+/Users/junjieding/dingjunjie_dev/2024_10/halashao/target/debug/deps/cocoa-642a3d3c3aff9f90.d: /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/lib.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/appkit.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/base.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/foundation.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/quartzcore.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/macros.rs
+
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/lib.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/appkit.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/base.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/foundation.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/quartzcore.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/cocoa-0.24.1/src/macros.rs:

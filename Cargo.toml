@@ -1,0 +1,37 @@
+[package]
+name = "xhs-crawler"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tauri = { version = "1.4", features = ["shell-open"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+fantoccini = "0.17"
+chrono = "0.4"
+rand = "0.8"
+base64 = "0.13"
+sha2 = "0.10"
+url = "2.2"
+image = "0.23"
+regex = "1.5"
+reqwest = { version = "0.11", features = ["json"] }
+log = "0.4"
+log4rs = "1.0"
+lazy_static = "1.4"
+
+[build-dependencies]
+tauri-build = { version = "1.4", features = [] }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
+
+[[bin]]
+name = "xhs-crawler"
+path = "src-tauri/src/main.rs"

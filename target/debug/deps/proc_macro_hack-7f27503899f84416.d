@@ -1,0 +1,9 @@
+/Users/junjieding/dingjunjie_dev/2024_10/halashao/target/debug/deps/libproc_macro_hack-7f27503899f84416.dylib: /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/lib.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/quote.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/error.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/iter.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/parse.rs
+
+/Users/junjieding/dingjunjie_dev/2024_10/halashao/target/debug/deps/proc_macro_hack-7f27503899f84416.d: /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/lib.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/quote.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/error.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/iter.rs /Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/parse.rs
+
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/lib.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/quote.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/error.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/iter.rs:
+/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/proc-macro-hack-0.5.20+deprecated/src/parse.rs:

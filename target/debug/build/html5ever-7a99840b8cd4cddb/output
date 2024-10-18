@@ -1,0 +1,1 @@
+cargo:rerun-if-changed=/Users/junjieding/.cargo/registry/src/rsproxy.cn-0dccff568467c15b/html5ever-0.26.0/src/tree_builder/rules.rs
