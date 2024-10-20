@@ -1,22 +1,27 @@
-use base64::{engine::general_purpose, Engine as _};
-use fantoccini::{Client, Locator};
-use image::{ImageBuffer, Rgb};
+use base64::{engine::general_purpose, Engine};
+use headless_chrome::Tab;
+use image::{GenericImageView, ImageBuffer, Rgb, RgbImage};
 use rand::seq::SliceRandom;
+use rand::thread_rng;
 use regex::Regex;
 use reqwest::Client as ReqwestClient;
-use serde_json::Value;
+
+// use serde_json::Value;
 use std::collections::HashMap;
-use std::io::Cursor;
+use std::sync::Arc;
+use log::info;
+use anyhow::Result;
 
-use crate::tools::utils::LOGGER;
-
-pub async fn find_login_qrcode(client: &Client, selector: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let element = client.find(Locator::Css(selector)).await?;
-    let login_qrcode_img = element.attr("src").await?.unwrap_or_default();
+pub async fn find_login_qrcode(tab: &Arc<Tab>, selector: &str) -> Result<String> {
+    info!("find_login_qrcode start selector {}", selector);
+    let element = tab.wait_for_element(selector)?;
+    info!("find_login_qrcode element: {:?}", element);
+    let login_qrcode_img = element.get_attribute_value("src")?
+        .ok_or_else(|| anyhow::anyhow!("Failed to get src attribute"))?;
 
     if login_qrcode_img.starts_with("http://") || login_qrcode_img.starts_with("https://") {
         let reqwest_client = ReqwestClient::new();
-        log::info!("[find_login_qrcode] get qrcode by url:{}", login_qrcode_img);
+        info!("[find_login_qrcode] get qrcode by url:{}", login_qrcode_img);
         let resp = reqwest_client.get(&login_qrcode_img)
             .header("User-Agent", get_user_agent())
             .send()
@@ -26,18 +31,25 @@ pub async fn find_login_qrcode(client: &Client, selector: &str) -> Result<String
             let image_data = resp.bytes().await?;
             Ok(general_purpose::STANDARD.encode(image_data))
         } else {
-            Err(format!("fetch login image url failed, response message:{}", resp.text().await?).into())
+            Err(anyhow::anyhow!("fetch login image url failed, response message:{}", resp.text().await?))
         }
     } else {
         Ok(login_qrcode_img)
     }
 }
 
-pub async fn find_qrcode_img_from_canvas(client: &Client, canvas_selector: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let canvas = client.find(Locator::Css(canvas_selector)).await?;
-    let screenshot = canvas.screenshot().await?;
-    Ok(general_purpose::STANDARD.encode(screenshot))
-}
+// pub async fn find_qrcode_img_from_canvas(tab: &Arc<Tab>, canvas_selector: &str) -> Result<String, Box<dyn std::error::Error>> {
+//     let js_script = format!(
+//         "return document.querySelector('{}').toDataURL('image/png').split(',')[1];",
+//         canvas_selector
+//     );
+//     let result = tab.evaluate(&js_script, false)?;
+//     let base64_image = result.value.into();
+//         .ok_or("Failed to convert canvas data to string")?
+//         .to_string();
+
+//     Ok(base64_image)
+// }
 
 pub fn show_qrcode(qr_code: &str) -> Result<(), Box<dyn std::error::Error>> {
     let qr_code = if qr_code.contains(',') {
@@ -50,7 +62,7 @@ pub fn show_qrcode(qr_code: &str) -> Result<(), Box<dyn std::error::Error>> {
     let img = image::load_from_memory(&qr_code)?;
 
     let (width, height) = img.dimensions();
-    let mut new_image = ImageBuffer::new(width + 20, height + 20);
+    let mut new_image: RgbImage = ImageBuffer::new(width + 20, height + 20);
 
     // Fill the new image with white
     for pixel in new_image.pixels_mut() {
@@ -58,7 +70,7 @@ pub fn show_qrcode(qr_code: &str) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Copy the original image to the center of the new image
-    image::imageops::overlay(&mut new_image, &img, 10, 10);
+    image::imageops::overlay(&mut new_image, &img.to_rgb8(), 10, 10);
 
     // Draw a black border
     for x in 0..width+20 {
@@ -70,16 +82,17 @@ pub fn show_qrcode(qr_code: &str) -> Result<(), Box<dyn std::error::Error>> {
         new_image.put_pixel(width+19, y, Rgb([0, 0, 0]));
     }
 
-    new_image.save("qrcode.png")?;
+    // 直接打开这个图片
     Ok(())
 }
+
 
 pub fn get_user_agent() -> String {
     let ua_list = vec![
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         // ... (其他 User-Agent 字符串)
     ];
-    ua_list.choose(&mut rand::thread_rng()).unwrap().to_string()
+    ua_list.choose(&mut thread_rng()).unwrap().to_string()
 }
 
 pub fn get_mobile_user_agent() -> String {
@@ -87,10 +100,10 @@ pub fn get_mobile_user_agent() -> String {
         "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1",
         // ... (其他移动设备 User-Agent 字符串)
     ];
-    ua_list.choose(&mut rand::thread_rng()).unwrap().to_string()
+    ua_list.choose(&mut thread_rng()).unwrap().to_string()
 }
 
-pub fn convert_cookies(cookies: Option<Vec<fantoccini::cookie::Cookie>>) -> (String, HashMap<String, String>) {
+pub fn convert_cookies(cookies: Option<Vec<headless_chrome::protocol::cdp::Network::Cookie>>) -> (String, HashMap<String, String>) {
     match cookies {
         Some(cookies) => {
             let cookies_str = cookies.iter()
@@ -126,24 +139,24 @@ pub fn match_interact_info_count(count_str: &str) -> i32 {
         .unwrap_or(0)
 }
 
-pub fn format_proxy_info(ip_proxy_info: &Value) -> (Option<HashMap<String, String>>, Option<HashMap<String, String>>) {
-    let playwright_proxy = Some(HashMap::from([
-        ("server".to_string(), format!("{}{}", ip_proxy_info["protocol"].as_str().unwrap_or(""), ip_proxy_info["ip"].as_str().unwrap_or(""))),
-        ("username".to_string(), ip_proxy_info["user"].as_str().unwrap_or("").to_string()),
-        ("password".to_string(), ip_proxy_info["password"].as_str().unwrap_or("").to_string()),
-    ]));
+// pub fn format_proxy_info(ip_proxy_info: &Value) -> (Option<HashMap<String, String>>, Option<HashMap<String, String>>) {
+//     let playwright_proxy = Some(HashMap::from([
+//         ("server".to_string(), format!("{}{}", ip_proxy_info["protocol"].as_str().unwrap_or(""), ip_proxy_info["ip"].as_str().unwrap_or(""))),
+//         ("username".to_string(), ip_proxy_info["user"].as_str().unwrap_or("").to_string()),
+//         ("password".to_string(), ip_proxy_info["password"].as_str().unwrap_or("").to_string()),
+//     ]));
 
-    let httpx_proxy = Some(HashMap::from([
-        (ip_proxy_info["protocol"].as_str().unwrap_or("").to_string(), 
-         format!("http://{}:{}@{}:{}", 
-                 ip_proxy_info["user"].as_str().unwrap_or(""),
-                 ip_proxy_info["password"].as_str().unwrap_or(""),
-                 ip_proxy_info["ip"].as_str().unwrap_or(""),
-                 ip_proxy_info["port"].as_str().unwrap_or("")))
-    ]));
+//     let httpx_proxy = Some(HashMap::from([
+//         (ip_proxy_info["protocol"].as_str().unwrap_or("").to_string(), 
+//          format!("http://{}:{}@{}:{}", 
+//                  ip_proxy_info["user"].as_str().unwrap_or(""),
+//                  ip_proxy_info["password"].as_str().unwrap_or(""),
+//                  ip_proxy_info["ip"].as_str().unwrap_or(""),
+//                  ip_proxy_info["port"].as_str().unwrap_or("")))
+//     ]));
 
-    (playwright_proxy, httpx_proxy)
-}
+//     (playwright_proxy, httpx_proxy)
+// }
 
 pub fn extract_text_from_html(html: &str) -> String {
     let script_re = Regex::new(r"<(script|style)[^>]*>.*?</\1>").unwrap();

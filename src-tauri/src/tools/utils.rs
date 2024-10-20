@@ -3,11 +3,11 @@ use log4rs::{
     append::file::FileAppender,
     config::{Appender, Config, Root},
     encode::pattern::PatternEncoder,
+    init_config,
+    Handle
 };
-use std::str::FromStr;
-use lazy_static::lazy_static;
 
-pub fn init_logging_config() -> log4rs::Handle {
+pub fn init_logging_config() -> Handle {
     let logfile = FileAppender::builder()
         .encoder(Box::new(PatternEncoder::new("{d} {l} {t} - {m}{n}")))
         .build("log/output.log")
@@ -18,11 +18,7 @@ pub fn init_logging_config() -> log4rs::Handle {
         .build(Root::builder().appender("logfile").build(LevelFilter::Info))
         .unwrap();
 
-    log4rs::init_config(config).unwrap()
-}
-
-lazy_static::lazy_static! {
-    pub static ref LOGGER: log4rs::Handle = init_logging_config();
+    init_config(config).unwrap()
 }
 
 pub fn str2bool(v: &str) -> Result<bool, String> {
