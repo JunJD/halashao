@@ -30,18 +30,31 @@ async fn run_crawler(state: tauri::State<'_, Arc<Mutex<Option<Browser>>>>) -> Re
     let browser = browser_option.as_ref().unwrap();
     let tab = browser.new_tab().map_err(|e| format!("Failed to create new tab: {}", e))?;
     tab.navigate_to("https://www.xiaohongshu.com").map_err(|e| e.to_string())?;
-    
+
     let mut login = xhs::login::XiaoHongShuLogin::new(
         unsafe { config::base_config::LOGIN_TYPE.to_owned() },
-        tab.clone()  // 在这里克隆 tab
+        tab.clone(),
+        // Some("13156626720".to_string()),
+        // config::base_config::COOKIES.to_owned(),
     );
-    login.begin().await.map_err(|e| format!("Failed to begin login: {}", e))?;
 
-    info!("login success");
+    let (qrcode, mut rx) = login.begin().await.map_err(|e| e.to_string())?;
 
-    // 这里可以添加后续操作
+    // 返回二维码给前端
+    tauri::async_runtime::spawn(async move {
+        if let Some(login_success) = rx.recv().await {
+            if login_success {
+                info!("登录成功");
+                // 这里可以继续执行爬虫逻辑
+            } else {
+                info!("登录失败");
+            }
+        } else {
+            info!("接收到空值或接收错误");
+        }
+    });
 
-    Ok("Crawler run successfully".to_string())
+    Ok(qrcode)
 }
 
 fn main() {

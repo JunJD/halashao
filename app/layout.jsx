@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { AlertProvider } from '@/components/ui/custom-alert-dialog';
 import "./globals.css";
 
 const geistSans = localFont({
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AlertProvider>
+          {children}
+        </AlertProvider>
       </body>
     </html>
   );
