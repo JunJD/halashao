@@ -2,6 +2,7 @@ use headless_chrome::{Browser, Tab};
 use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::error::Error;
+use std::sync::Arc;
 use std::time::Duration;
 use reqwest::Client as ReqwestClient;
 use anyhow::{Result, anyhow};
@@ -23,17 +24,16 @@ pub struct XiaoHongShuClient {
     http_client: ReqwestClient,
 }
 
-#[async_trait]
 impl XiaoHongShuClient {
     pub fn new(
-        tab: Tab,
+        tab: Arc<Tab>,
         headers: HashMap<String, String>,
         cookie_dict: HashMap<String, String>,
-        timeout: Duration,
+        timeout: Option<Duration>,
         proxies: Option<String>,
     ) -> Result<Self> {
         let http_client = ReqwestClient::builder()
-            .timeout(timeout)
+            .timeout(timeout.expect("REASON"))
             .build()?;
 
         Ok(Self {
@@ -42,7 +42,7 @@ impl XiaoHongShuClient {
             cookie_dict,
             host: "https://edith.xiaohongshu.com".to_string(),
             domain: "https://www.xiaohongshu.com".to_string(),
-            timeout,
+            timeout: Duration::from_secs(30),
             proxies,
             http_client,
         })
@@ -130,7 +130,7 @@ impl XiaoHongShuClient {
 
     pub async fn pong(&self) -> Result<bool> {
         info!("[XiaoHongShuClient.pong] Begin to pong xhs...");
-        match self.get_note_by_keyword("小红书", 1, 20, SearchSortType::GENERAL, SearchNoteType::ALL).await {
+        match self.get_note_by_keyword("小红书", 1, 20, SearchSortType::General, SearchNoteType::All).await {
             Ok(note_card) => Ok(note_card.get("items").is_some()),
             Err(e) => {
                 info!("[XiaoHongShuClient.pong] Ping xhs failed: {}, and try to login again...", e);

@@ -1,3 +1,6 @@
+// browser user agent
+pub const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
 // 基础配置
 pub const PLATFORM: &str = "xhs";
 pub const KEYWORDS: &str = "月嫂 合肥";

@@ -1,11 +1,12 @@
 use base64::{engine::general_purpose, Engine as _};
-use chrono::Utc;
-// use chrono::Utc;
 use rand::Rng;
 use serde_json::json;
 // use sha2::{Digest, Sha256};
 use std::time::{SystemTime, UNIX_EPOCH};
 use url::form_urlencoded;
+
+use num_bigint::{BigInt, Sign};
+use num_traits::{Zero, One};
 
 pub fn sign(a1: &str, b1: &str, x_s: &str, x_t: &str) -> serde_json::Value {
     let common = json!({
@@ -108,25 +109,47 @@ fn encode_utf8(e: &str) -> Vec<u8> {
     form_urlencoded::byte_serialize(e.as_bytes()).flat_map(|c| c.as_bytes().to_vec()).collect()
 }
 
-pub fn base36encode(mut number: i64) -> String {
-    const ALPHABET: &str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if number == 0 {
-        return "0".to_string();
+fn base36encode(number: BigInt, alphabet: Option<&str>) -> String {
+    let alphabet_str = alphabet.unwrap_or("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    let base = BigInt::from(alphabet_str.len());
+    let mut n = number;
+    let mut result = String::new();
+    
+    // 检查数字的符号，并处理负数
+    let sign = if n.sign() == Sign::Minus {
+        n = -n;
+        "-"
+    } else {
+        ""
+    };
+
+    // 如果 n 在 0 到字母表长度之间，直接返回对应字符
+    if n.is_zero() {
+        return sign.to_owned() + &alphabet_str.chars().next().unwrap().to_string();
     }
-    let mut base36 = String::new();
-    while number > 0 {
-        base36.insert(0, ALPHABET.chars().nth((number % 36) as usize).unwrap());
-        number /= 36;
+
+    while !n.is_zero() {
+        let (div, modulo) = n.div_rem(&base);
+        result.push(
+            alphabet_str
+                .chars()
+                .nth(modulo.to_usize().expect("Invalid modulo value"))
+                .expect("Invalid index in alphabet"),
+        );
+        n = div;
     }
-    base36
+
+    sign.to_owned() + &result.chars().rev().collect::<String>()
 }
 
-pub fn get_search_id() -> String {
-    // let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
-    let now = Utc::now().timestamp_millis() as i64;
-    let e = now * 1000 << 64;
-    let t = rand::thread_rng().gen_range(0..2147483647);
-    base36encode(e + t)
+fn get_search_id() -> String {
+    let now = BigInt::from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis());
+    let e = now << 64; // 这里不会溢出，因为 BigInt 可以自动扩展
+    let t = BigInt::from(rand::thread_rng().gen_range(0..2147483647));
+    let result = e + t; // 结果也是 BigInt
+
+    // 将 BigInt 转换为 base36 字符串（需要实现 base36 编码）
+    base36encode(result, None)
 }
 
 pub fn get_img_url_by_trace_id(trace_id: &str, format_type: &str) -> String {
