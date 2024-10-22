@@ -53,7 +53,7 @@ async fn run_crawler(state: tauri::State<'_, Arc<Mutex<Option<Browser>>>>, windo
                 let cookies_result = tab_clone.get_cookies();
                 let cookies_option = cookies_result.ok(); // 将 Result 转换为 Option
                 let (cookie_str, cookie_dict) = tools::crawler_util::convert_cookies(cookies_option);
-                let mut client = xhs::client::XiaoHongShuClient::new(
+                let client = xhs::client::XiaoHongShuClient::new(
                     tab_clone,
                     HashMap::from([
                         ("User-Agent".to_owned(), config::base_config::USER_AGENT.to_owned()),
@@ -65,7 +65,7 @@ async fn run_crawler(state: tauri::State<'_, Arc<Mutex<Option<Browser>>>>, windo
                     cookie_dict.clone(),
                     None,
                     None
-                );
+                ).unwrap();
                 client.pong().await.unwrap();
             } else {
                 info!("登录失败");
